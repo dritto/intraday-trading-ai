@@ -49,21 +49,32 @@ def get_backtest_symbols():
     symbols = [f.split('_performance.json')[0] for f in files if f.endswith('_performance.json')]
     return sorted(list(set(symbols)))
 
+def _load_local_status_file():
+    """Helper to load local status file for testing."""
+    status_file = 'logs/portfolio_status.json'
+    if os.path.exists(status_file):
+        try:
+            with open(status_file, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            st.error(f"Error loading local portfolio status file: {e}")
+            return {}
+    return {}
+
 def load_portfolio_status():
     """Loads the latest portfolio status from the JSON file."""
-    # For cloud deployment, read from a URL defined in secrets.
-    # For local testing, this check will be false and it will fall back to the local file.
-    if "GIST_RAW_URL" in st.secrets:
+    try:
+        # This block will execute successfully in the cloud where secrets are defined.
         status_url = st.secrets["GIST_RAW_URL"]
-        try:
-            response = requests.get(status_url, timeout=10)
-            response.raise_for_status()
-            return response.json()
-        except Exception as e:
-            st.error(f"Error loading portfolio status from URL: {e}")
-            return {}
-    else: # Local fallback
+        response = requests.get(status_url, timeout=10)
+        response.raise_for_status()
+        return response.json()
+    except (st.errors.StreamlitAPIException, KeyError):
+        # This block will execute on a local machine where secrets are not available.
         return _load_local_status_file()
+    except requests.RequestException as e:
+        st.error(f"Error loading portfolio status from URL: {e}")
+        return {}
 
 # --- Main Dashboard ---
 st.title("📈 Live Trading Bot Dashboard")
@@ -153,15 +164,3 @@ else:
 
         if os.path.exists(trades_chart_path):
             st.image(trades_chart_path, caption="Trade Analysis Chart", use_column_width=True)
-
-def _load_local_status_file():
-    """Helper to load local status file for testing."""
-    status_file = 'logs/portfolio_status.json'
-    if os.path.exists(status_file):
-        try:
-            with open(status_file, 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            st.error(f"Error loading local portfolio status file: {e}")
-            return {}
-    return {}
