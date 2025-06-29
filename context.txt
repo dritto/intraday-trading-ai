@@ -1,0 +1,164 @@
+Project Title: Intelligent Intraday Trading System for Nifty 50 Stocks using AI & TradingView
+
+⸻
+
+1. Project Overview
+
+This project aims to build a modular, intelligent, and fully automated intraday trading system for Nifty 50 stocks using real-time and historical data from TradingView. The system will analyze market sentiment, indicator signals, sector influence, and price action across multiple timeframes to recommend trades and execute them via Angel One’s SmartAPI.
+
+⸻
+
+2. Key Goals and End Objectives
+	•	Pre-market analysis: The code should be capable enough to analyze the Nifty 50 stocks before market opens, identifying potential of the stocks in which the price is expected to be going up or down in the current intraday session.
+    •	Pre-market analysis: The code should be capable enough to analyze the stocks using various indicators like RSI, MACD, Bollinger Bands, EMA(50/200), Volume, ATR, etc. to identify the stocks.
+    •	Pre-market analysis: The code should be capable enough to analyze the stocks using its major parent indexes. 
+    •	Pre-market analysis: The code should be capable enough to analyze the stocks using various time intervals month, week, day, 4 hrs, 2 hrs, 1hr, 30 mins.
+    •	Pre-market analysis: The code should be capable enough to analyze according to the various percentage of the weigth the price of stock is either going to rise or fall. Like the parent index has the most weightage of 50% and the stock has 30% weightage, then the stock is expected to rise or fall by 30% of the parent index.
+    •	Pre-market analysis: The code should be capable enough to list the stocks precict the nifty 50 index flow based various other major indexes like Bank nifty, Nifty IT, Nifty Auto, etc. according to the percentage of the weightage of the stock in the index.
+    •	Pre-market analysis: The code should be capable enough to show the stocks and how they are going to perform along with the reasons. 
+    •	Pre-market analysis: There should be a backtesting feature to test the stocks and their performance in the past.
+    •	Pre-market analysis: The code should only select 4 stocks that are going to rise and 4 stocks that are going to fall in the current intraday session.
+    •	Pre-market analysis: The AI should suggest a more profesional Approach to the analysis and selection of stocks.
+
+	•	Current Intraday Session: The code select the stocks only after 10:00 AM and before 2:00 PM.
+    •	Current Intraday Session: The code should be capable enough to analyze the stocks using various indicators like RSI, MACD, Bollinger Bands, EMA(50/200), Volume, ATR, etc. to identify the stocks.
+    •	Current Intraday Session: The code should be capable enough to analyze the stocks using its major parent indexes.
+    •	Current Intraday Session: The code should be capable enough to analyze the stocks using various time intervals like week, day 4 hrs, 2 hrs, 1hr, 30 mins, 15 mins, 5 mins, 1 min.
+    •	Current Intraday Session: The code should be capable enough to analyze according to the various percentage of the weight the price of stock is either going to rise or fall. Like the parent index has the most weightage of 50% and the stock has 30% weightage, then the stock is expected to rise or fall by 30% of the parent index.
+    • Current Intraday Session: The code should be capable enough to list the stocks precict the nifty 50 index flow based various other major indexes like Bank nifty, Nifty IT, Nifty Auto, etc. according to the percentage of the weightage of the stock in the index.
+    • Current Intraday Session: The code should be capable enough to show the stocks and how they are going to perform along with the reasons.
+    • Current Intraday Session: There should be a backtesting feature to test the stocks and their performance in the past.
+    • Current Intraday Session: The code should only select two stocks that are going to rise and two stocks that are going to fall in the current intraday session that were selected in the pre-market analysis.
+    •	Current Intraday Session: The code should execute the trades only in one stock at a time and should not execute the trades in all the stocks at once.
+    •	Current Intraday Session: The code should execute the trade only when there is a confluence of signals from the indicators and the parent index and the nifty 50 index. Not directly execute the trade based on the indicators alone or right at the opening of the market or at 10:00 AM.
+    •	Current Intraday Session: The AI should suggest a more professional Approach to the analysis and selection of stocks.
+    •	Current Intraday Session: The code should be capable enough to execute the trades via Angel One (SmartAPI) and should not use any other broker or API.
+    •	Current Intraday Session: The code should be capable enough to execute the trades only when the price of the stock is going to rise or fall by 1% or more from the current price.
+    •	Current Intraday Session: The code should be capable enough to exactly when to enter and exit the trade based on the confluence of signals from the indicators and the parent index and the nifty 50 index.
+
+    •	Backtesting Platform: The code should be capable enough to backtest the stocks and their performance in the past.
+    •	Backtesting Platform: The code should be capable enough to backtest the stocks using various indicators like RSI, MACD, Bollinger Bands, EMA(50/200), Volume, ATR, etc. to identify the stocks.
+    •	Backtesting Platform: The code should be capable enough to backtest the stocks using its major parent indexes.
+    •	Backtesting Platform: The code should be capable enough to backtest the stocks using various time intervals like week, day 4 hrs, 2 hrs, 1hr, 30 mins, 15 mins, 5 mins, 1 min.
+    •	Backtesting Platform: The code should be capable enough to backtest according to the various percentage of the weight the price of stock is either going to rise or fall. Like the parent index has the most weightage of 50% and the stock has 30% weightage, then the stock is expected to rise or fall by 30% of the parent index.
+    •	Backtesting Platform: The code should be capable enough to backtest the stocks precict the nifty 50 index flow based various other major indexes like Bank nifty, Nifty IT, Nifty Auto, etc. according to the percentage of the weightage of the stock in the index.
+    •	Backtesting Platform: The code should be capable enough to be used for both pre-market analysis and current intraday session.
+    •	Backtesting Platform: The code should be capable enough to show the stocks and how they are going to perform along with the reasons.
+    •	Backtesting Platform: The AI should suggest a more professional Approach to the analysis and selection of stocks.
+
+	•	Achieve high-probability intraday trades using AI-assisted technical analysis. There should intensive use of AI in both pre-market analysis and current intraday session. 
+    •	
+
+	•	Operate entirely on data and signals from TradingView for the historical and real-time data.
+	•	Execute trades via Angel One (SmartAPI). 
+	•	Modular system capable of individual component testing, backtesting, and updates.
+	•	Self-learning and adaptive through trading diary and AI feedback loops.
+
+⸻
+
+3. High-Level Requirements
+
+Data Sources:
+	•	Real-time data: TradingView WebSocket Feed (via automation).
+	•	Historical data: TradingView (via tvdatafeed or scraping).
+	•	Stock list: Nifty 50 components.
+
+Execution Layer:
+	•	Broker: Angel One using SmartAPI.
+	•	Authentication: Token-based with session renewal.
+
+Technical Analysis Tools:
+	•	RSI, MACD, Bollinger Bands, EMA(50/200), Volume, ATR.
+	•	Pivot points, trendline slope detection.
+
+Infrastructure:
+	•	Python environment (To be shifted to Docker container in future, but not now because of the simplicity requirements).
+	•	Book Keeping to log trades, reasons, and performance metrics.
+    •	Backtesting engine for historical data evaluation.
+	•	Logging, monitoring, and alert system.
+    •	AI layer for strategy recommendation and performance feedback.
+    •	Modular design for easy updates and testing.
+    •	A web interface for easy view of the executed trades and selected stocks (optional, can be CLI-based for now).
+
+
+⸻
+
+4. Directory Structure (AI can suggest improvements)
+To maintain modularity and clarity, the project will be structured as follows but AI can siggest improvements:
+
+project-root/
+├── datafeed/
+│   └── stream_tv_ws.py          # Live data streamer from TradingView
+├── execution/
+│   └── order_executor.py        # Interface to place trades via Angel One
+├── indicators/
+│   └── rsi_macd_bbands.py       # Combined logic for technical indicators
+├── strategies/
+│   └── intraday_strategy.py     # Core trading logic
+├── sentiment/
+│   └── gift_nifty.py            # Market sentiment analysis from Gift Nifty
+├── sector_analysis/
+│   └── sector_influence.py      # Sector-specific influence check
+├── ai_assistant/
+│   └── strategy_recommender.py  # AI layer to suggest strategies
+├── backtesting/
+│   └── backtester.py            # Historical performance evaluation
+├── journal/
+│   └── trade_journal.py         # Logging and self-learning feedback
+├── dashboard/
+│   └── dashboard.py             # UI interface (optional)
+├── logs/
+│   └── trade_logs.log
+├── config/
+│   └── settings.yaml            # Configuration settings
+├── main.py                      # Entrypoint
+├── requirements.txt             # Python dependencies
+├── Dockerfile
+└── README.md
+
+
+⸻
+
+5. Feature Set
+	•	Stock Screener: Nifty 50-based screener with volume filters.
+	•	Market Sentiment: Analysis from Gift Nifty and Nifty 50.
+	•	Sector Mapping: Match stock with corresponding sector trend.
+	•	Multi-Timeframe Analysis: 1-min and 5-min charts.
+	•	Technical Signals: RSI divergence, MACD crossover, EMA slopes.
+	•	Volume & Volatility Filters: ATR-based thresholding.
+	•	Smart Entry & Exit: Based on confluence of signals.
+	•	Trade Diary: Log reasons and metrics for each trade.
+	•	Backtest Engine: Test strategies across historical TradingView data.
+	•	AI Feedback Loop: Learn from trade performance and optimize.
+
+⸻
+
+6. Modular Components
+	•	Datafeed: Real-time feed handler and simulator.
+	•	Indicators: Plug-and-play technical indicators.
+	•	Strategies: Reusable logic functions; can be AI-enhanced.
+	•	Execution: Broker API interface with fail-safe features.
+	•	Analytics: Logging, metrics, and feedback.
+	•	UI/Reports: Optional dashboard or CLI-based reports.
+
+⸻
+
+7. Development Approach
+	1.	Build data pipeline for real-time streaming and historical fetch.
+	2.	Implement core technical indicators as reusable modules.
+	3.	Develop initial strategies (simple logic).
+	4.	Integrate broker API for real-time trade execution.
+	5.	Add logging and trade journaling.
+	6.	Backtest strategies and refine.
+	7.	Introduce AI layer for dynamic trade recommendation.
+	8.	Setup alerting/monitoring for system health.
+
+⸻
+
+8. Agent Mode Context for AI
+	•	This system is under active development with the end goal of becoming a plug-and-play AI trader.
+	•	User is focused on Nifty 50 intraday trades using 1m and 5m charts.
+	•	All data comes from TradingView; Angel One is used only for order execution.
+	•	Avoid use of yfinance or unrelated APIs.
+	•	System will be trained to suggest stocks, time entries, and analyze sentiment daily.
+	•	Project will evolve into an intelligent assistant capable of justifying every trade.

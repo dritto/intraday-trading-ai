@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+venv/
+*.env
+
+# Logs
+logs/
+*.log
+
+# IDE / Editor specific
+.idea/
+.vscode/
+
+# Generated plot files from backtesting
+*.png
+
+# Configuration - IMPORTANT: Do not commit secrets
+config/

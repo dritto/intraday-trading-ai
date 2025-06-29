@@ -1,0 +1,11 @@
+git+https://github.com/rongardF/tvdatafeed.git
+pandas
+PyYAML
+pytest
+smartapi-python
+logzero
+matplotlib
+yfinance
+google-generativeai
+streamlit
+PyGithub
