@@ -2,6 +2,7 @@ import logging
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import json
 import os
 
 from src.core.strategy import TradingStrategy
@@ -110,15 +111,25 @@ class BacktestingEngine:
             self.equity_curve.append(portfolio_value)
         # If a position is still open at the end, close it at the last price
         if self.positions and self.open_trade_entry:
-            position = self.positions.pop('current_trade')
             last_price = data['close'].iloc[-1]
             last_timestamp = data.index[-1]
-            self.equity = position['quantity'] * last_price
-            # Note: We do not append to equity_curve here as the last value is already calculated in the loop.
+            # The _close_position function will handle popping the position and calculating equity
             self._close_position(last_price, last_timestamp, 'EOD_CLOSE')
 
         logger.info("Backtest run complete.")
         results = self.calculate_performance()
+
+        # Save performance metrics to a file
+        if not os.path.exists(self.results_dir):
+            os.makedirs(self.results_dir)
+        try:
+            results_path = os.path.join(self.results_dir, f'{symbol}_performance.json')
+            with open(results_path, 'w') as f:
+                json.dump(results, f, indent=4)
+            logger.info(f"Performance results saved to {results_path}")
+        except Exception as e:
+            logger.error(f"Failed to save performance results for {symbol}: {e}")
+
         self.print_results(results)
         if plot:
             self.generate_plots(data, symbol)
@@ -212,7 +223,7 @@ class BacktestingEngine:
         plt.figure(figsize=(12, 6))
         # Use the data's index for the x-axis for accurate time representation
         # We slice equity_curve to match the length of the data index used in the loop
-        plt.plot(data.index, self.equity_curve[1:], label='Equity Curve')
+        plt.plot(data.index, self.equity_curve, label='Equity Curve')
         plt.title(f'Portfolio Equity Curve for {symbol}')
         plt.xlabel('Date')
         plt.ylabel('Portfolio Value ($)')

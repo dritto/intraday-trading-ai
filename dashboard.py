@@ -39,12 +39,22 @@ def load_trade_journal():
             return pd.DataFrame()
     return pd.DataFrame()
 
+def get_backtest_symbols():
+    """Scans the results directory to find available backtested symbols."""
+    results_dir = 'results'
+    if not os.path.exists(results_dir):
+        return []
+    files = os.listdir(results_dir)
+    # Extract symbol from filenames like 'RELIANCE_performance.json'
+    symbols = [f.split('_performance.json')[0] for f in files if f.endswith('_performance.json')]
+    return sorted(list(set(symbols)))
+
 def load_portfolio_status():
     """Loads the latest portfolio status from the JSON file."""
     # For cloud deployment, read from a URL defined in secrets.
-    # For local testing, fall back to the local file.
-    status_url = st.secrets.get("GIST_RAW_URL")
-    if status_url:
+    # For local testing, this check will be false and it will fall back to the local file.
+    if "GIST_RAW_URL" in st.secrets:
+        status_url = st.secrets["GIST_RAW_URL"]
         try:
             response = requests.get(status_url, timeout=10)
             response.raise_for_status()
@@ -108,6 +118,41 @@ if not journal_df.empty:
     st.dataframe(journal_df.sort_values(by='exit_timestamp', ascending=False), use_container_width=True)
 else:
     st.info("No completed trades in the journal yet.")
+
+# --- Backtest Results ---
+st.header("Backtest Analysis")
+backtest_symbols = get_backtest_symbols()
+
+if not backtest_symbols:
+    st.info("No backtest results found. Run a backtest first using `python src/main.py backtest`.")
+else:
+    selected_symbol = st.selectbox("Select a stock to view its backtest results:", backtest_symbols)
+
+    if selected_symbol:
+        # Load performance data
+        perf_file = f"results/{selected_symbol}_performance.json"
+        if os.path.exists(perf_file):
+            with open(perf_file, 'r') as f:
+                perf_data = json.load(f)
+            
+            st.subheader(f"Performance Metrics for {selected_symbol}")
+            
+            m_col1, m_col2, m_col3, m_col4 = st.columns(4)
+            m_col1.metric("Net PnL", f"₹{perf_data.get('net_pnl', 0):,.2f}")
+            m_col2.metric("Total Return", f"{perf_data.get('total_return_pct', 0):.2f}%")
+            m_col3.metric("Win Rate", f"{perf_data.get('win_rate_pct', 0):.2f}%")
+            m_col4.metric("Sharpe Ratio", f"{perf_data.get('sharpe_ratio', 0):.2f}")
+        
+        # Display plots
+        st.subheader("Backtest Charts")
+        equity_chart_path = f"results/equity_curve_{selected_symbol}.png"
+        trades_chart_path = f"results/trades_chart_{selected_symbol}.png"
+
+        if os.path.exists(equity_chart_path):
+            st.image(equity_chart_path, caption="Equity Curve", use_column_width=True)
+
+        if os.path.exists(trades_chart_path):
+            st.image(trades_chart_path, caption="Trade Analysis Chart", use_column_width=True)
 
 def _load_local_status_file():
     """Helper to load local status file for testing."""

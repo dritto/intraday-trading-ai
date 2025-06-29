@@ -2,6 +2,8 @@ import argparse
 import logging
 import sys
 import itertools
+import multiprocessing
+import os
 from pathlib import Path
 import pandas as pd
 
@@ -32,6 +34,39 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+def run_backtest_worker(args):
+    """
+    A worker function designed to be run in a separate process for a single backtest.
+    It takes a single tuple of arguments to be compatible with multiprocessing.Pool.
+    """
+    symbol, params, strategy_params, base_data = args
+    
+    # Each process should have its own logger instance.
+    worker_logger = logging.getLogger(f"worker_{os.getpid()}")
+    worker_logger.info(f"Processing: {symbol} with {params}")
+
+    try:
+        data = base_data.copy()
+        data = calculate_rsi(data)
+        data = calculate_macd(data)
+        data = calculate_bollinger_bands(data, period=params['bb_period'], std_dev=params['bb_std_dev'])
+        data.dropna(inplace=True)
+
+        if data.empty:
+            return None
+
+        strategy = TradingStrategy(rsi_oversold=params['rsi_oversold'], rsi_overbought=params['rsi_overbought'])
+        engine = BacktestingEngine(
+            initial_capital=100000.0,
+            stop_loss_pct=strategy_params.get('stop_loss_pct', 0.0),
+            take_profit_pct=strategy_params.get('take_profit_pct', 0.0)
+        )
+        performance = engine.run(data, strategy, symbol, plot=False)
+        return {'symbol': symbol, **params, **performance}
+    except Exception as e:
+        worker_logger.error(f"Error in worker for {symbol} with {params}: {e}")
+        return None
 
 def run_live_trading(config):
     """Initializes and runs the live trading bot."""
@@ -163,40 +198,36 @@ def run_optimization(config, stock_list):
         'bb_std_dev': [2.0, 2.5]
     }
 
-    # Create all unique combinations of parameters
+    # 2. Create all unique combinations of parameters
     keys, values = zip(*param_grid.items())
     param_combinations = [dict(zip(keys, v)) for v in itertools.product(*values)]
     logger.info(f"Will test {len(param_combinations)} parameter combinations for each stock.")
 
     data_fetcher = DataFetcher()
-    all_results_list = []
+    tasks = []
 
+    # 3. Prepare the list of tasks to be executed in parallel
     for symbol in stock_list:
-        logger.info(f"================== Optimizing for {symbol} ==================")
+        logger.info(f"================== Preparing tasks for {symbol} ==================")
         base_data = data_fetcher.fetch_historical_data(symbol, 'NSE', Interval.in_1_hour, n_bars=500)
         if base_data is None:
             logger.error(f"Could not fetch data for {symbol}. Skipping optimization.")
             continue
+        
+        for params in param_combinations:
+            tasks.append((symbol, params, strategy_params, base_data))
 
-        for i, params in enumerate(param_combinations):
-            logger.info(f"Running combination {i+1}/{len(param_combinations)} for {symbol}: {params}")
-            
-            data = base_data.copy()
-            data = calculate_rsi(data)
-            data = calculate_macd(data)
-            data = calculate_bollinger_bands(data, period=params['bb_period'], std_dev=params['bb_std_dev'])
-            data.dropna(inplace=True)
+    # 4. Run tasks in parallel using a process pool
+    # We use cpu_count() - 1 to leave one core free for system operations.
+    num_processes = max(1, multiprocessing.cpu_count() - 1)
+    logger.info(f"Distributing {len(tasks)} backtesting tasks across {num_processes} processes...")
+    
+    with multiprocessing.Pool(processes=num_processes) as pool:
+        all_results_list = pool.map(run_backtest_worker, tasks)
 
-            strategy = TradingStrategy(rsi_oversold=params['rsi_oversold'], rsi_overbought=params['rsi_overbought'])
-            engine = BacktestingEngine(
-                initial_capital=100000.0,
-                stop_loss_pct=strategy_params.get('stop_loss_pct', 0.0),
-                take_profit_pct=strategy_params.get('take_profit_pct', 0.0)
-            )
-            performance = engine.run(data, strategy, symbol, plot=False)
-            
-            result_row = {'symbol': symbol, **params, **performance}
-            all_results_list.append(result_row)
+    # 5. Process the results
+    # Filter out any failed runs which return None
+    all_results_list = [r for r in all_results_list if r is not None]
 
     if all_results_list:
         results_df = pd.DataFrame(all_results_list)

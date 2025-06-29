@@ -1,0 +1,10 @@
+{
+    "initial_capital": 100000.0,
+    "final_equity": 109612.04509983773,
+    "net_pnl": 9612.045099837735,
+    "total_return_pct": 9.61204509983773,
+    "total_trades": 5,
+    "win_rate_pct": 60.0,
+    "max_drawdown_pct": -4.582799855994776,
+    "sharpe_ratio": 2.7879270646135548
+}
